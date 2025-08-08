@@ -1,0 +1,30 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
+import openai
+import os
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("📰 اخبار روز", callback_data="latest_news")],
+        [InlineKeyboardButton("📥 دانلود کلیپ از اینستاگرام", callback_data="insta_download")],
+        [InlineKeyboardButton("🤖 سوالات درباره استقلال", callback_data="ask_ai")],
+        [InlineKeyboardButton("📅 بازی‌های آینده لیگ", callback_data="league_schedule")],
+        [InlineKeyboardButton("🎁 سوالات جایزه‌دار", callback_data="quiz")],
+        [InlineKeyboardButton("📣 تبلیغات", callback_data="ads")],
+        [InlineKeyboardButton("📲 ارسال به دوستان", switch_inline_query="")],
+        [InlineKeyboardButton("📷 اینستاگرام آبی دل", url="https://www.instagram.com/Abi_Deell/")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("🎽 به ربات تلگرام آبی دل خوش آمدید!", reply_markup=reply_markup)
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("لطفاً از منوی زیر گزینه‌ای را انتخاب کنید.")
+
+if __name__ == "__main__":
+    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.run_polling()
